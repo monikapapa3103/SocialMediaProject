@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Social Media Data Analysis and Visualization System - A comprehensive web application for analyzing engagement, views, likes, comments, and shares across Instagram, Facebook, YouTube, LinkedIn, and X.">
+    <meta name="keywords" content="Social Media Analytics, Engagement Rate, Data Visualization, Chart.js, BCA Project">
+    <meta name="author" content="BCA Final Year Student">
+    <title>Social Media Data Analysis and Visualization System | BCA Final Year Project</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Chart.js 4.4.1 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Application Top Navigation Bar -->
+    <header class="app-header">
+        <div class="header-container">
+            <div class="brand-wrapper">
+                <div class="brand-logo-icon">
+                    <i class="fa-solid fa-chart-pie"></i>
+                </div>
+                <div class="brand-text">
+                    <h1>
+                        Social Media Data Analytics
+                        <span class="project-tag">BCA Final Year Project</span>
+                    </h1>
+                    <span class="brand-sub">
+                        <i class="fa-solid fa-circle-check text-green"></i> Live Analytics Engine &bull; Multi-Platform Intelligence
+                    </span>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <button class="btn btn-primary" onclick="openModal('addPostModal')" id="addNewPostBtn">
+                    <i class="fa-solid fa-plus"></i> Add Post
+                </button>
+                <button class="btn btn-secondary" onclick="openModal('uploadModal')" id="uploadCsvNavBtn">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Upload CSV
+                </button>
+                <button class="btn btn-secondary" id="exportCsvBtn" title="Export current filtered data to CSV file">
+                    <i class="fa-solid fa-file-export"></i> Export CSV
+                </button>
+                <button class="btn btn-outline" onclick="openModal('vivaGuideModal')" title="View Project Abstract, Formulae, and Viva Q&A">
+                    <i class="fa-solid fa-graduation-cap"></i> Project Viva Guide
+                </button>
+                <button class="btn btn-secondary btn-icon-only" id="themeToggleBtn" title="Toggle Dark/Light Mode">
+                    <i class="fa-solid fa-sun" id="themeIcon"></i>
+                </button>
+                <button class="btn btn-secondary btn-icon-only" id="printReportBtn" title="Print Academic Analytics Report">
+                    <i class="fa-solid fa-print"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dashboard Container -->
+    <main class="main-wrapper">
+
+        <!-- 1. Top Metric KPI Summary Cards -->
+        <section class="stats-grid" id="kpiCardsSection">
+            <!-- Total Views -->
+            <div class="stat-card card-views">
+                <div class="stat-card-header">
+                    <span class="stat-title">Total Views / Reach</span>
+                    <div class="stat-icon-wrapper">
+                        <i class="fa-solid fa-eye"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="cardTotalViews">0</div>
+                <div class="stat-sub" id="cardTotalViewsSub">0 total impressions</div>
+            </div>
+
+            <!-- Total Likes -->
+            <div class="stat-card card-likes">
+                <div class="stat-card-header">
+                    <span class="stat-title">Total Likes</span>
+                    <div class="stat-icon-wrapper">
+                        <i class="fa-solid fa-heart"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="cardTotalLikes">0</div>
+                <div class="stat-sub" id="cardTotalLikesSub">0 total reactions</div>
+            </div>
+
+            <!-- Total Comments -->
+            <div class="stat-card card-comments">
+                <div class="stat-card-header">
+                    <span class="stat-title">Total Comments</span>
+                    <div class="stat-icon-wrapper">
+                        <i class="fa-solid fa-comment-dots"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="cardTotalComments">0</div>
+                <div class="stat-sub" id="cardTotalCommentsSub">0 discussions</div>
+            </div>
+
+            <!-- Total Shares -->
+            <div class="stat-card card-shares">
+                <div class="stat-card-header">
+                    <span class="stat-title">Total Shares / Reposts</span>
+                    <div class="stat-icon-wrapper">
+                        <i class="fa-solid fa-share-nodes"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="cardTotalShares">0</div>
+                <div class="stat-sub" id="cardTotalSharesSub">0 virality shares</div>
+            </div>
+
+            <!-- Avg Engagement Rate -->
+            <div class="stat-card card-engagement">
+                <div class="stat-card-header">
+                    <span class="stat-title">Avg Engagement Rate</span>
+                    <div class="stat-icon-wrapper">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="cardAvgEngagement">0.00%</div>
+                <div class="stat-sub" id="cardAvgEngagementSub">Formula: (Interactions / Views) &times; 100</div>
+            </div>
+
+            <!-- Total Posts Tracked -->
+            <div class="stat-card card-posts">
+                <div class="stat-card-header">
+                    <span class="stat-title">Filtered Posts</span>
+                    <div class="stat-icon-wrapper">
+                        <i class="fa-solid fa-layer-group"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="cardTotalPosts">0</div>
+                <div class="stat-sub" id="cardTotalPostsSub">from 30 total posts</div>
+            </div>
+        </section>
+
+        <!-- 2. Smart Algorithmic Insights Banner (AI / Automated Discovery) -->
+        <section class="insights-container" id="smartInsightsBanner">
+            <!-- Dynamically populated by updateSmartInsights() -->
+        </section>
+
+        <!-- 3. Platform-Wise Analysis Summary Cards (Clickable Filter Cards) -->
+        <section>
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">
+                        <i class="fa-solid fa-network-wired text-purple"></i>
+                        Platform-Wise Performance
+                    </h2>
+                    <p class="section-sub">Cross-channel comparative performance &bull; Click any platform card to isolate analytics</p>
+                </div>
+            </div>
+
+            <div class="platforms-grid">
+                <!-- Instagram -->
+                <div class="platform-stat-card" data-platform="Instagram" title="Click to filter by Instagram">
+                    <div class="platform-card-top">
+                        <div class="platform-brand-info">
+                            <div class="platform-icon-circle">
+                                <i class="fa-brands fa-instagram"></i>
+                            </div>
+                            <span class="platform-brand-name">Instagram</span>
+                        </div>
+                        <span class="platform-post-count">0 Posts</span>
+                    </div>
+                    <div class="platform-card-metrics">
+                        <div class="platform-metric-item">
+                            <span class="platform-metric-label">Views</span>
+                            <span class="platform-metric-value platform-views-count">0</span>
+                        </div>
+                        <div class="platform-metric-item">
+                            <span class="platform-metric-label">Avg Engagement</span>
+                            <span class="platform-metric-value platform-rate-val text-red">0%</span>
+                        </div>
+                    </div>
+                    <div class="platform-card-footer">
+                        <span>Top Format: <strong class="platform-top-format">Reel</strong></span>
+                        <i class="fa-solid fa-chevron-right text-muted"></i>
+                    </div>
+                </div>
+
+                <!-- Facebook -->
+                <div class="platform-stat-card" data-platform="Facebook" title="Click to filter by Facebook">
+                    <div class="platform-card-top">
+                        <div class="platform-brand-info">
+                            <div class="platform-icon-circle">
+                                <i class="fa-brands fa-facebook-f"></i>
+                            </div>
+                            <span class="platform-brand-name">Facebook</span>
+                        </div>
+                        <span class="platform-post-count">0 Posts</span>
+                    </div>
+                    <div class="platform-card-metrics">
+                        <div class="platform-metric-item">
+                            <span class="platform-metric-label">Views</span>
+                            <span class="platform-metric-value platform-views-count">0</span>
+                        </div>
+                        <div class="platform-metric-item">
+                            <span class="platform-metric-label">Avg Engagement</span>
+                            <span class="platform-metric-value platform-rate-val text-blue">0%</span>
+                        </div>
+                    </div>
+                    <div class="platform-card-footer">
+                        <span>Top Format: <strong class="platform-top-format">Video</strong></span>
+                        <i class="fa-solid fa-chevron-right text-muted"></i>
+                    </div>
+                </div>
+
+                <!-- YouTube -->
+                <div class="platform-stat-card" data-platform="YouTube" title="Click to filter by YouTube">
+                    <div class="platform-card-top">
+                        <div class="platform-brand-info">
+                            <div class="platform-icon-circle">
+                                <i class="fa-brands fa-youtube"></i>
+                            </div>
+                            <span class="platform-brand-name">YouTube</span>
+                        </div>
+                        <span class="platform-post-count">0 Posts</span>
+                    </div>
+                    <div class="platform-card-metrics">
+                        <div class="platform-metric-item">
+                            <span class="platform-metric-label">Views</span>
+                            <span class="platform-metric-value platform-views-count">0</span>
+                        </div>
+                        <div class="platform-metric-item">
+                            <span class="platform-metric-label">Avg Engagement</span>
+                            <span class="platform-metric-value platform-rate-val text-red">0%</span>
+                        </div>
+                    </div>
+                    <div class="platform-card-footer">
+                        <span>Top Format: <strong class="platform-top-format">Short</strong></span>
+                        <i class="fa-solid fa-chevron-right text-muted"></i>
+                    </div>
+                </div>
+
+                <!-- LinkedIn -->
+                <div class="platform-stat-card" data-platform="LinkedIn" title="Click to filter by LinkedIn">
+                    <div class="platform-card-top">
+                        <div class="platform-brand-info">
+                            <div class="platform-icon-circle">
+                                <i class="fa-brands fa-linkedin-in"></i>
+                            </div>
+                            <span class="platform-brand-name">LinkedIn</span>
+                        </div>
+                        <span class="platform-post-count">0 Posts</span>
+                    </div>
+                    <div class="platform-card-metrics">
+                        <div class="platform-metric-item">
+                            <span class="platform-metric-label">Views</span>
+                            <span class="platform-metric-value platform-views-count">0</span>
+                        </div>
+                        <div class="platform-metric-item">
+                            <span class="platform-metric-label">Avg Engagement</span>
+                            <span class="platform-metric-value platform-rate-val text-cyan">0%</span>
+                        </div>
+                    </div>
+                    <div class="platform-card-footer">
+                        <span>Top Format: <strong class="platform-top-format">Carousel</strong></span>
+                        <i class="fa-solid fa-chevron-right text-muted"></i>
+                    </div>
+                </div>
+
+                <!-- X (Twitter) -->
+                <div class="platform-stat-card" data-platform="X" title="Click to filter by X (Twitter)">
+                    <div class="platform-card-top">
+                        <div class="platform-brand-info">
+                            <div class="platform-icon-circle">
+                                <i class="fa-brands fa-x-twitter"></i>
+                            </div>
+                            <span class="platform-brand-name">X (Twitter)</span>
+                        </div>
+                        <span class="platform-post-count">0 Posts</span>
+                    </div>
+                    <div class="platform-card-metrics">
+                        <div class="platform-metric-item">
+                            <span class="platform-metric-label">Views</span>
+                            <span class="platform-metric-value platform-views-count">0</span>
+                        </div>
+                        <div class="platform-metric-item">
+                            <span class="platform-metric-label">Avg Engagement</span>
+                            <span class="platform-metric-value platform-rate-val text-green">0%</span>
+                        </div>
+                    </div>
+                    <div class="platform-card-footer">
+                        <span>Top Format: <strong class="platform-top-format">Text</strong></span>
+                        <i class="fa-solid fa-chevron-right text-muted"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Interactive Charts Section (Chart.js) -->
+        <section>
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">
+                        <i class="fa-solid fa-chart-line text-cyan"></i>
+                        Interactive Visual Analytics
+                    </h2>
+                    <p class="section-sub">Dynamic data modeling across chronological timelines and engagement dimensions</p>
+                </div>
+            </div>
+
+            <!-- Primary Charts Grid: Trend & Share -->
+            <div class="charts-grid-primary">
+                <div class="chart-card">
+                    <div class="chart-card-header">
+                        <div class="chart-title">
+                            <i class="fa-solid fa-arrow-trend-up text-primary"></i>
+                            Performance Over Time
+                        </div>
+                        <span class="chart-title-tag">Views vs Interactions Trend</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-card-header">
+                        <div class="chart-title">
+                            <i class="fa-solid fa-chart-pie text-secondary"></i>
+                            Platform Share
+                        </div>
+                        <span class="chart-title-tag">Distribution (%)</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="platformDistChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Secondary Charts Grid: Metrics, Content Format, and Top 5 Posts -->
+            <div class="charts-grid-secondary" style="margin-top: 1.25rem;">
+                <div class="chart-card">
+                    <div class="chart-card-header">
+                        <div class="chart-title">
+                            <i class="fa-solid fa-chart-column text-info"></i>
+                            Reactions Breakdown by Platform
+                        </div>
+                        <span class="chart-title-tag">Likes vs Comments vs Shares</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="platformMetricsChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-card-header">
+                        <div class="chart-title">
+                            <i class="fa-solid fa-sliders text-success"></i>
+                            Avg Engagement by Format
+                        </div>
+                        <span class="chart-title-tag">Rate by Post Type (%)</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="postTypeChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-card-header">
+                        <div class="chart-title">
+                            <i class="fa-solid fa-trophy text-amber"></i>
+                            Top 5 Performing Posts
+                        </div>
+                        <span class="chart-title-tag">Ranked by Engagement %</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="topPostsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Advanced Search & Multi-Criteria Filtering Toolbar -->
+        <section class="filter-card" id="filterSection">
+            <div class="filter-row">
+                <!-- Search Input -->
+                <div class="search-input-group">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" placeholder="Search caption, creator handle, #hashtag, or keyword..." autocomplete="off">
+                </div>
+
+                <!-- Filter Controls Group -->
+                <div class="filter-controls-group">
+                    <!-- Platform Filter -->
+                    <div class="filter-item">
+                        <label for="platformFilter"><i class="fa-solid fa-filter"></i> Platform:</label>
+                        <select id="platformFilter">
+                            <option value="ALL">All Platforms</option>
+                            <option value="Instagram">Instagram</option>
+                            <option value="YouTube">YouTube</option>
+                            <option value="LinkedIn">LinkedIn</option>
+                            <option value="Facebook">Facebook</option>
+                            <option value="X">X (Twitter)</option>
+                        </select>
+                    </div>
+
+                    <!-- Post Type Filter -->
+                    <div class="filter-item">
+                        <label for="postTypeFilter"><i class="fa-solid fa-icons"></i> Format:</label>
+                        <select id="postTypeFilter">
+                            <option value="ALL">All Formats</option>
+                            <option value="Reel">Reels</option>
+                            <option value="Short">Shorts</option>
+                            <option value="Video">Videos</option>
+                            <option value="Carousel">Carousels</option>
+                            <option value="Image">Images</option>
+                            <option value="Text">Text</option>
+                        </select>
+                    </div>
+
+                    <!-- Date Range: From -->
+                    <div class="filter-item">
+                        <label for="dateFrom">From:</label>
+                        <input type="date" id="dateFrom">
+                    </div>
+
+                    <!-- Date Range: To -->
+                    <div class="filter-item">
+                        <label for="dateTo">To:</label>
+                        <input type="date" id="dateTo">
+                    </div>
+
+                    <!-- Min Engagement Rate Slider -->
+                    <div class="filter-item">
+                        <label for="minEngagement">Min Rate:</label>
+                        <div class="range-slider-wrapper">
+                            <input type="range" id="minEngagement" min="0" max="15" step="0.5" value="0">
+                            <span class="range-slider-val" id="minEngagementVal">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <button class="btn btn-secondary btn-sm" id="resetFiltersBtn" title="Reset all search queries and filters">
+                        <i class="fa-solid fa-rotate-left"></i> Reset
+                    </button>
+                    <button class="btn btn-outline btn-sm" id="reloadDefaultDataBtn" title="Restore sample dataset to original state">
+                        <i class="fa-solid fa-database"></i> Reload Sample
+                    </button>
+                    <button class="btn btn-outline btn-sm" id="downloadSampleCsvBtn" title="Download sample CSV template for upload testing">
+                        <i class="fa-solid fa-file-arrow-down"></i> Sample CSV
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. Social Media Data Table Section -->
+        <section class="table-card" id="dataTableSection">
+            <div class="table-card-header">
+                <div>
+                    <h3 class="section-title">
+                        <i class="fa-solid fa-table text-primary"></i>
+                        Social Media Posts Dataset
+                    </h3>
+                    <span class="section-sub">Click any table row to view mathematical breakdown and caption details</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div class="filter-item">
+                        <label for="pageSizeSelect">Show:</label>
+                        <select id="pageSizeSelect">
+                            <option value="5">5 rows</option>
+                            <option value="10" selected>10 rows</option>
+                            <option value="20">20 rows</option>
+                            <option value="50">50 rows</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th data-sort="id">ID <i class="sort-icon fa-solid fa-sort"></i></th>
+                            <th data-sort="platform">Platform <i class="sort-icon fa-solid fa-sort"></i></th>
+                            <th data-sort="account">Creator / Handle <i class="sort-icon fa-solid fa-sort"></i></th>
+                            <th data-sort="post_type">Type <i class="sort-icon fa-solid fa-sort"></i></th>
+                            <th data-sort="date">Date <i class="sort-icon fa-solid fa-arrow-down active"></i></th>
+                            <th>Caption Preview</th>
+                            <th data-sort="views" class="td-num">Views <i class="sort-icon fa-solid fa-sort"></i></th>
+                            <th data-sort="likes" class="td-num">Likes <i class="sort-icon fa-solid fa-sort"></i></th>
+                            <th data-sort="comments" class="td-num">Comments <i class="sort-icon fa-solid fa-sort"></i></th>
+                            <th data-sort="shares" class="td-num">Shares <i class="sort-icon fa-solid fa-sort"></i></th>
+                            <th data-sort="engagement">Eng. Rate <i class="sort-icon fa-solid fa-sort"></i></th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTableBody">
+                        <!-- Dynamically populated by renderTable() -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Footer -->
+            <div class="table-footer">
+                <div class="pagination-info" id="paginationInfo">
+                    Showing 1 to 10 of 30 posts
+                </div>
+                <div class="pagination-controls">
+                    <button class="btn btn-secondary btn-sm" id="prevPageBtn" disabled>
+                        <i class="fa-solid fa-chevron-left"></i> Prev
+                    </button>
+                    <div id="paginationPages" style="display: flex; gap: 0.25rem;"></div>
+                    <button class="btn btn-secondary btn-sm" id="nextPageBtn">
+                        Next <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ==========================================================================
+         MODAL 1: CSV FILE UPLOAD MODAL
+         ========================================================================== -->
+    <div class="modal-backdrop" id="uploadModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fa-solid fa-file-csv text-primary"></i>
+                    Upload Social Media CSV Dataset
+                </h3>
+                <button class="modal-close-btn" onclick="closeModal('uploadModal')">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 0.85rem; color: var(--text-secondary);">
+                    Select or drag-and-drop a CSV file containing social media records. The parser supports columns:
+                    <code>id, platform, account, post_type, date, caption, views, likes, comments, shares</code>.
+                </p>
+
+                <!-- Drag & drop zone -->
+                <div class="drop-zone" id="dropZone" onclick="document.getElementById('csvFileInput').click()">
+                    <i class="fa-solid fa-cloud-arrow-up drop-zone-icon"></i>
+                    <h4>Choose a CSV File or Drag & Drop Here</h4>
+                    <p>Supported format: <strong>.csv</strong> &bull; Client-side instant parsing</p>
+                    <input type="file" id="csvFileInput" accept=".csv" style="display: none;">
+                </div>
+
+                <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.85rem; font-size: 0.78rem; color: var(--text-secondary);">
+                    <strong><i class="fa-solid fa-circle-info text-info"></i> CSV Format Guideline:</strong>
+                    <ul style="margin-left: 1.25rem; margin-top: 0.35rem; line-height: 1.6;">
+                        <li>Required column: <code>platform</code> (Instagram, Facebook, YouTube, LinkedIn, X).</li>
+                        <li>Numeric columns: <code>views, likes, comments, shares</code>.</li>
+                        <li>Commata within quotes are handled automatically by the custom parser.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('uploadModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="document.getElementById('csvFileInput').click()">
+                    <i class="fa-solid fa-folder-open"></i> Browse File
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+         MODAL 2: ADD NEW POST MODAL
+         ========================================================================== -->
+    <div class="modal-backdrop" id="addPostModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fa-solid fa-square-plus text-primary"></i>
+                    Add New Social Media Post
+                </h3>
+                <button class="modal-close-btn" onclick="closeModal('addPostModal')">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form id="addPostForm">
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="newPlatform">Social Platform *</label>
+                            <select id="newPlatform" required>
+                                <option value="Instagram">Instagram</option>
+                                <option value="YouTube">YouTube</option>
+                                <option value="LinkedIn">LinkedIn</option>
+                                <option value="Facebook">Facebook</option>
+                                <option value="X">X (Twitter)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="newAccount">Creator Handle / Page *</label>
+                            <input type="text" id="newAccount" placeholder="e.g. @techpulse_official" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="newPostType">Post Format *</label>
+                            <select id="newPostType" required>
+                                <option value="Reel">Reel</option>
+                                <option value="Short">Short</option>
+                                <option value="Video">Video</option>
+                                <option value="Carousel">Carousel</option>
+                                <option value="Image">Image</option>
+                                <option value="Text">Text</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="newDate">Publication Date *</label>
+                            <input type="date" id="newDate" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="newCaption">Post Caption / Text</label>
+                        <textarea id="newCaption" placeholder="Write caption or summary with relevant #hashtags..."></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="newViews">Views / Impressions *</label>
+                            <input type="number" id="newViews" placeholder="e.g. 50000" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="newLikes">Likes *</label>
+                            <input type="number" id="newLikes" placeholder="e.g. 4200" min="0" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="newComments">Comments *</label>
+                            <input type="number" id="newComments" placeholder="e.g. 350" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="newShares">Shares / Reposts *</label>
+                            <input type="number" id="newShares" placeholder="e.g. 820" min="0" required>
+                        </div>
+                    </div>
+
+                    <!-- Live Calculated Engagement Rate Preview -->
+                    <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.85rem; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 0.82rem; color: var(--text-secondary);">Calculated Engagement Rate:</span>
+                        <strong id="newEngPreview" style="font-size: 1.15rem; color: var(--primary); font-family: 'Outfit', sans-serif;">0.00%</strong>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addPostModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa-solid fa-floppy-disk"></i> Save Post
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+         MODAL 3: POST DETAILS & FORMULA BREAKDOWN MODAL
+         ========================================================================== -->
+    <div class="modal-backdrop" id="postDetailsModal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fa-solid fa-magnifying-glass-chart text-cyan"></i>
+                    Post Performance Breakdown
+                </h3>
+                <button class="modal-close-btn" onclick="closeModal('postDetailsModal')">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="postDetailsBody">
+                <!-- Dynamically populated by openPostModal() in app.js -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('postDetailsModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+         MODAL 4: BCA PROJECT INFO & VIVA GUIDE MODAL
+         ========================================================================== -->
+    <div class="modal-backdrop" id="vivaGuideModal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fa-solid fa-graduation-cap text-primary"></i>
+                    BCA Final Year Project Guide & Viva Prep
+                </h3>
+                <button class="modal-close-btn" onclick="closeModal('vivaGuideModal')">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="modal-body" style="font-size: 0.85rem; line-height: 1.6; color: var(--text-secondary);">
+                
+                <h4 style="color: var(--text-primary); margin-bottom: 0.35rem;">1. Project Title & Abstract</h4>
+                <p>
+                    <strong>Title:</strong> Social Media Data Analysis and Visualization System<br>
+                    <strong>Abstract:</strong> This project is a responsive, web-based analytics dashboard designed to ingest, process, aggregate, and visualize multi-platform social media data across Instagram, Facebook, YouTube, LinkedIn, and X (Twitter). The system allows creators, digital marketers, and researchers to track key performance indicators (KPIs), compute engagement rates, and uncover actionable content trends.
+                </p>
+
+                <h4 style="color: var(--text-primary); margin-top: 1rem; margin-bottom: 0.35rem;">2. Core Mathematical Formula</h4>
+                <div style="background: var(--bg-surface-elevated); padding: 0.85rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <code style="font-size: 0.95rem; color: var(--primary); font-weight: bold;">
+                        Engagement Rate (%) = [ (Total Likes + Total Comments + Total Shares) / Total Views ] &times; 100
+                    </code>
+                    <p style="margin-top: 0.5rem; font-size: 0.8rem;">
+                        <strong>Interpretation:</strong> Measures the proportion of viewers who interacted with the post rather than passively scrolling past it.
+                        Benchmarks: <strong>&ge; 8% (Viral)</strong>, <strong>5%–7.9% (High)</strong>, <strong>2.5%–4.9% (Moderate)</strong>, <strong>&lt; 2.5% (Low)</strong>.
+                    </p>
+                </div>
+
+                <h4 style="color: var(--text-primary); margin-top: 1rem; margin-bottom: 0.35rem;">3. Technology Stack</h4>
+                <ul style="margin-left: 1.25rem;">
+                    <li><strong>Frontend Structure:</strong> Semantic HTML5 elements (<code>&lt;header&gt;</code>, <code>&lt;main&gt;</code>, <code>&lt;section&gt;</code>, <code>&lt;table&gt;</code>).</li>
+                    <li><strong>Styling & Layout:</strong> Modern Vanilla CSS3 with CSS Custom Properties (Variables), Flexbox, CSS Grid, Glassmorphism, and responsive breakpoints.</li>
+                    <li><strong>Client-Side Engine:</strong> Vanilla JavaScript (ES6+), DOM Manipulation, Event Listeners, FileReader API for CSV parsing.</li>
+                    <li><strong>Data Visualization:</strong> Chart.js 4.4.1 for interactive Line, Doughnut, Grouped Bar, and Horizontal Bar charts.</li>
+                    <li><strong>Typography & Icons:</strong> Google Fonts (Inter, Outfit) and FontAwesome 6.</li>
+                </ul>
+
+                <h4 style="color: var(--text-primary); margin-top: 1rem; margin-bottom: 0.35rem;">4. Common Viva Examination Q&A</h4>
+                <div style="display: flex; flex-direction: column; gap: 0.65rem; margin-top: 0.5rem;">
+                    <div>
+                        <strong style="color: var(--text-primary);">Q1: How does the CSV file parser work without backend libraries?</strong><br>
+                        <span>A: The system uses JavaScript's native <code>FileReader</code> API to read the text stream from user uploads. A custom parser processes quotations containing commas and escapes, parses header rows, and constructs clean JavaScript objects for state updates.</span>
+                    </div>
+                    <div>
+                        <strong style="color: var(--text-primary);">Q2: How are dynamic filters synchronized with the charts?</strong><br>
+                        <span>A: An application state object (<code>AppState</code>) maintains active filters. Whenever an input changes, <code>applyFilters()</code> produces an updated subset array and triggers <code>updateAllCharts()</code>, which re-aggregates metrics and re-renders Chart.js instances without reloading the browser.</span>
+                    </div>
+                    <div>
+                        <strong style="color: var(--text-primary);">Q3: Can new posts be added at runtime?</strong><br>
+                        <span>A: Yes. The system includes an "Add Post" modal that calculates engagement rates in real time and prepends new entries to the dataset, instantly updating KPI cards, tables, and graphs.</span>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeModal('vivaGuideModal')">Got It</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Scripts (Ordered for dependency resolution) -->
+    <script src="js/data.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/app.js"></script>
+
+    <!-- Set default date in Add Post Modal to today -->
+    <script>
+        document.getElementById('newDate').value = new Date().toISOString().split('T')[0];
+    </script>
+</body>
+</html>
